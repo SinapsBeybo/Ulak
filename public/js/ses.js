@@ -1,9 +1,45 @@
 let audioIN = { audio: true };
 //  audio is true, for recording 
-
+// Start record
+let start = document.getElementById('btnStart');
+let sayac = document.getElementById('sayac');
 // Access the permission for use 
 // the microphone 
 let playAudio;
+let timebetween = 0;
+let totalSeconds = 0;
+let minutesLabel = document.getElementById("minutes");
+let secondsLabel = document.getElementById("seconds");
+let myVar;
+
+function setTime() {
+    ++totalSeconds;
+    secondsLabel.innerHTML = pad(Math.floor(totalSeconds % 60));
+    minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+}
+
+function pad(val) {
+    var valString = val + "";
+    if (valString.length < 2) {
+        return "0" + valString;
+    } else {
+        return valString;
+    }
+}
+
+start.onmousedown = function() {
+    sayac.style.display = "block";
+    secondsLabel.innerHTML = "00";
+    minutesLabel.innerHTML = "00";
+    clearInterval(myVar);
+    myVar = setInterval(setTime, 1000);
+};
+
+start.onmouseup = function() {
+    clearInterval(myVar);
+    totalSeconds = 0;
+    sayac.style.display = "none";
+};
 navigator.mediaDevices.getUserMedia(audioIN)
 
     // 'then()' method returns a Promise 
@@ -32,8 +68,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
           audio.play(); 
         }; */
 
-        // Start record 
-        let start = document.getElementById('btnStart');
+
 
         // Stop record 
         let stop = document.getElementById('btnStop');
@@ -49,15 +84,25 @@ navigator.mediaDevices.getUserMedia(audioIN)
 
         // Start event 
         start.addEventListener('click', function(ev) {
-
+            //sayac.style.display = "none";
         })
         start.addEventListener('touchstart', function(ev) {
             start.style.color = "red";
+            sayac.style.display = "block";
+            secondsLabel.innerHTML = "00";
+            minutesLabel.innerHTML = "00";
+            clearInterval(myVar);
+            myVar = setInterval(setTime, 1000);
             mediaRecorder.start();
             // console.log(mediaRecorder.state); 
         })
         start.addEventListener('mousedown', function(ev) {
             start.style.color = "red";
+            sayac.style.display = "block";
+            secondsLabel.innerHTML = "00";
+            minutesLabel.innerHTML = "00";
+            clearInterval(myVar);
+            myVar = setInterval(setTime, 1000);
             mediaRecorder.start();
             // console.log(mediaRecorder.state); 
         })
@@ -66,16 +111,28 @@ navigator.mediaDevices.getUserMedia(audioIN)
         start.addEventListener('mouseup', function(ev) {
             mediaRecorder.stop();
             start.style.color = "black";
+
+            clearInterval(myVar);
+            totalSeconds = 0;
+            sayac.style.display = "none";
             // console.log(mediaRecorder.state); 
         });
         start.addEventListener('touchend', function(ev) {
             mediaRecorder.stop();
             start.style.color = "black";
+
+            clearInterval(myVar);
+            totalSeconds = 0;
+            sayac.style.display = "none";
             // console.log(mediaRecorder.state); 
         });
         start.addEventListener('mouseleave', function(ev) {
             mediaRecorder.stop();
             start.style.color = "black";
+
+            clearInterval(myVar);
+            totalSeconds = 0;
+            sayac.style.display = "none";
             // console.log(mediaRecorder.state); 
         });
 
@@ -124,7 +181,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
         console.log(err.name, err.message);
     });
 
- function blob2base64(superBuffer) {
+function blob2base64(superBuffer) {
 
     var reader = new window.FileReader();
     reader.readAsDataURL(superBuffer);
@@ -135,22 +192,23 @@ navigator.mediaDevices.getUserMedia(audioIN)
         playAudio.setAttribute("controls", "");
         await sleep(300);
         playAudio.setAttribute("preload", "metadata");
-        playAudio.setAttribute("duration",playAudio.duration);
+        playAudio.setAttribute("duration", playAudio.duration);
         var sure;
-        sure=playAudio.duration;
+        sure = playAudio.duration;
         console.log("Süre1:" + sure);
         emitMess(sure);
     }
 }
 
-function emitMess(sure){
+function emitMess(sure) {
     console.log("Süre2:" + sure);
-        if (sure >= 1 && sure != Infinity) {
-            // Emit message to server
-            socket.emit('chatMessage', playAudio.outerHTML);
-            
-        }
+    if (secondsLabel.innerText >= 1 || minutesLabel.innerText >= 1) {
+        // Emit message to server
+        socket.emit('chatMessage', playAudio.outerHTML);
+
+    }
 }
+
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -6,6 +6,10 @@ const ikon = document.getElementById('ikon').href;
 const dosyaSec = document.getElementById('dosya');
 let mesajSahibi;
 let saatFormat;
+var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+link.type = 'image/x-icon';
+link.rel = 'shortcut icon';
+document.getElementsByTagName('head')[0].appendChild(link);
 let intv = undefined;
 // Get username and room from URL
 const {
@@ -23,6 +27,7 @@ window.onerror = function(error) {
 window.onfocus = function() {
     clearInterval(intv);
     document.title = "Sinaps Ulak";
+    link.href = 'https://120.120.16.151:3000/img/ulakLogo.png';
     intv = undefined;
     //socket.emit('chatMessage', "Görüldü");
 };
@@ -94,12 +99,7 @@ function outputMessage(message) {
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
-            /*var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            document.getElementsByTagName('head')[0].appendChild(link);*/
-
-           // a ? link.href = 'https://120.120.16.151:3000/img/transmitterLogo.png' : link.href = 'https://120.120.16.151:3000/img/ulakLogo.png';
+            a ? link.href = 'https://120.120.16.151:3000/img/transmitterLogo.png' : link.href = 'https://120.120.16.151:3000/img/ulakLogo.png';
             a ? document.title = "Yeni Mesajınız var" : document.title = "Sinaps Ulak";
 
             a = !a;
@@ -109,9 +109,9 @@ function outputMessage(message) {
 
 function messageOwnerControl(mUsername) {
     if (username == mUsername) {
-        return false;
-    } else {
         return true;
+    } else {
+        return false;
     }
 }
 
@@ -131,6 +131,8 @@ function baglantiKontrol() {
     if (!socket.connected) {
         alert("Lütfen Sayfayı Yenileyin");
         document.getElementById("msg").disabled = true;
+        document.getElementById("dosya").disabled = true;
+        document.getElementById("btnStart").disabled = true;
     }
 }
 
@@ -141,6 +143,8 @@ function titleDegistir() {
 window.onoffline = (event) => {
     alert("internet gitti");
     document.getElementById("msg").disabled = true;
+    document.getElementById("dosya").disabled = true;
+    document.getElementById("btnStart").disabled = true;
 };
 
 window.ononline = (event) => {
