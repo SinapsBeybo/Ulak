@@ -4,6 +4,10 @@ const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
 const ikon = document.getElementById('ikon').href;
 const dosyaSec = document.getElementById('dosya');
+const $kalin = document.getElementById('bold');
+const $italik = document.getElementById('italik');
+var boldMu = false;
+var italikMi = false;
 let mesajSahibi;
 let saatFormat;
 var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
@@ -27,7 +31,7 @@ window.onerror = function(error) {
 window.onfocus = function() {
     clearInterval(intv);
     document.title = "Sinaps Ulak";
-    link.href = 'https://120.120.16.151:3000/img/ulakLogo.png';
+    link.href = '/img/ulakLogo.png';
     intv = undefined;
     //socket.emit('chatMessage', "Görüldü");
 };
@@ -63,7 +67,8 @@ chatForm.addEventListener('submit', e => {
 
     if (!socket.connected) alert("Disconnect oldunuz");
     // Get message text
-    const msg = e.target.elements.msg.value;
+    let msg = e.target.elements.msg.value;
+    msg = formatKontrol(msg);
     // Emit message to server
     socket.emit('chatMessage', msg);
 
@@ -81,30 +86,29 @@ function outputMessage(message) {
     div.classList.add('message');
     div.classList.add('meta');
     mesajSahibi = message.username;
+    console.log("Mesajın:" + message.text);
+    //message.text=toggleItalik(message.text);
     console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
-        div.innerHTML = `<p class="meta" style="text-align:right">${message.username} <span style="text-align:right">${message.time}</span></p>
-  <p class="text" style="text-align:right">
-    ${message.text}
-  </p>`;
+        div.innerHTML = '<p class="meta" style="text-align:right">' + message.username + '<span style="text-align:right">' + message.time + '</span></p><p class="text" style="text-align:right">' +
+            message.text + '</p>';
     } else {
-        div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
-  <p class="text">
-    ${message.text}
-  </p>`;
+        div.innerHTML = '<p class="meta">'+message.username+'<span>'+message.time+'</span></p><p class="text">'+message.text+'</p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
     if (!document.hasFocus() && !messageOwnerControl(message.username)) {
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
-            a ? link.href = 'https://120.120.16.151:3000/img/transmitterLogo.png' : link.href = 'https://120.120.16.151:3000/img/ulakLogo.png';
+            a ? link.href = '/img/transmitterLogo.png' : link.href = '/img/ulakLogo.png';
             a ? document.title = "Yeni Mesajınız var" : document.title = "Sinaps Ulak";
 
             a = !a;
         }, 500);
     };
+    boldMu = false;
+    italikMi = false;
 }
 
 function messageOwnerControl(mUsername) {
@@ -159,9 +163,8 @@ window.ononline = (event) => {
  */
 var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 Notification.requestPermission(function(permission) {});
-
 socket.on('show_notification', function(data) {
-    if (username != data.title) {
+      if (username != data.title && userList.textContent.includes(data.title)) {
         if (data.message.includes("<img")) {
             showDesktopNotification(data.title, "1 Yeni Resim Alındı", data.icon);
         } else if (data.message.includes("<video")) {
@@ -276,4 +279,41 @@ dosyaSec.onchange = e => {
     } else {
         alert("Seçtiğiniz Dosyanın Boyutu 10 MB'dan Büyük. Gönderilemiyor. ");
     }
+}
+
+function toggleBold() {
+    if (boldMu == false) {
+        $kalin.style.backgroundColor = "teal";
+        $kalin.style.color = "white";
+        boldMu = true;
+    } else if (boldMu == true) {
+        $kalin.style.backgroundColor = "white";
+        $kalin.style.color = "teal";
+        boldMu = false;
+    }
+}
+
+function toggleItalik(message) {
+    if (italikMi == false) {
+        $italik.style.backgroundColor = "teal";
+        $italik.style.color = "white";
+        italikMi = true;
+    } else if (italikMi == true) {
+        $italik.style.backgroundColor = "white";
+        $italik.style.color = "teal";
+        italikMi = false;
+    }
+}
+
+function formatKontrol(argument) {
+    if (boldMu) {
+        argument = "<b>" + argument + "</b>";
+        toggleBold();
+    }
+    if (italikMi) {
+        argument = "<i>" + argument + "</i>";
+        toggleItalik();
+    }
+    return argument;
+
 }
