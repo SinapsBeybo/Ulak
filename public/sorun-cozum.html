@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="shortcut icon" id="ikon" type="image/png" href="/img/ulakLogo.png">
+    <title id="title">Sinaps Ulak</title>
+</head>
+
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <h1><img class="mb-2" src="/img/ulakLogo.svg" width="32px" height="32px"> Sinaps Ulak-Sorun&Çözüm</h1>
+            <button class="btn btn-light" onclick="geriDon();"><i class="fas fa-reply"></i></button>
+        </header>
+        <main class="container">
+            <ul id="sorunlar">
+                <li id="wireless">
+                    <h5 class="accordion">Wireless Bağlantısı Yok ve Wireless İşaretinin Üzerinde Sarı Ünlem Varsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin<br>
+                    <p>1-Ağ(Wireless) işaretine tıklayınız.<br>2-Ağ&İnternet ayarları<br><img class="mb-2 img-fluid" src="/img/cozumler/internet1-2.png"><br>3-Bağdaştırıcı Seçeneklerini değiştir<br><img class="mb-2 img-fluid" src="/img/cozumler/internet3.png"><img class="mb-2 img-fluid" src="/img/cozumler/internet4.png"><h5>Wi-Fi devre dışı ise</h5>Wi-Fi seçeneğini seçin ve Bu Aygıtı Etkinleştirin<br>Hata ile karşılaşırsanız veya Wi-Fi etkinleştirilmezse bilgisayarı yeniden başlatın. Ve yukarıdaki adımları tekrar edin.</p>
+                    </div>
+                </li>
+                <li id="barkod">
+                    <h5 class="accordion">Barkod Okuyucu Çalışmıyorsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="pc">
+                    <h5 class="accordion">Bilgisayar Açılmıyorsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="elektrik">
+                    <h5 class="accordion">Elektrik Yoksa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="priz">
+                    <h5 class="accordion">Prizde Arıza Varsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="firefox">
+                    <h5 class="accordion">Firefox Uygulaması Açılmıyorsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="ekran">
+                    <h5 class="accordion">Ekranda Siyah Bölge Varsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="dokunmatik">
+                    <h5 class="accordion">Dokunmatik Çalışmıyor</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="titreme">
+                    <h5 class="accordion">Ekranda Titreme Var</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="mavi">
+                    <h5 class="accordion">Mavi Ekran Var</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="windows">
+                    <h5 class="accordion">Windows Güncelleme Yapıyor</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="adicomp">
+                    <h5 class="accordion">Standart Dışı Adicomp</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="android">
+                    <h5 class="accordion">Android İşletim Sistemi Açılmışsa</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="sifre">
+                    <h5 class="accordion">Şifremi Unuttum</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="sketch">
+                    <h5 class="accordion">Sketch Yüklenmemiş</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+                <li id="ad">
+                    <h5 class="accordion">AD yüklenmemiş</h5>
+                    <div class="panel">Aşağıdaki adımları izleyin</div>
+                </li>
+            </ul>
+        </main>
+    </div>
+    <script src="js/qs.min.js"></script>
+    <script src="js/sorun-cozum.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</body>
+
+</html>

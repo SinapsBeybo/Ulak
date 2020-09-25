@@ -189,6 +189,7 @@ function blob2base64(superBuffer) {
         base64 = reader.result;
         base64 = base64.split(',')[1];
         playAudio.src = "data:audio/mp3;base64," + base64;
+        playAudio.classList.add("img-fluid");
         playAudio.setAttribute("controls", "");
         await sleep(300);
         playAudio.setAttribute("preload", "metadata");

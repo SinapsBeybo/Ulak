@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="shortcut icon" id="ikon" type="image/png" href="/img/ulakLogo.png">
+    <title id="title">Sinaps Ulak</title>
+</head>
+
+<body>
+    <iframe class="panel" style="position: sticky;bottom: 59px;left: 0;" src="https://120.120.16.151:3000" width="480" height="600" allowfullscreen></iframe>
+    <button class="accordion" style="width: 480px;position: sticky;bottom: 0;left: 0;">
+        <header class="chat-header">
+            <h1><img class="mb-2" src="/img/ulakLogo.svg" width="32px" height="32px"> Sinaps Ulak</h1>
+        </header>
+    </button>
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.previousElementSibling;
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+            }
+        });
+    }
+    </script>
+    <style type="text/css">
+    .accordion {
+        background-color: #eee;
+        color: #444;
+        cursor: pointer;
+        padding: 18px;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        transition: 0.4s;
+    }
+
+    .active,
+    .accordion:hover {
+        background-color: #ccc;
+    }
+
+    .panel {
+        padding: 0 18px;
+        display: none;
+        background-color: white;
+        overflow: hidden;
+    }
+    </style>
+</body>
+
+</html>
