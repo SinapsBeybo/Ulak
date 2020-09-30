@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="shortcut icon" id="ikon" type="image/png" href="https://120.120.16.151:3000/img/ulakLogo.png">
+    <link href="css/sweetalert.css" rel="stylesheet" />
+    <link rel="shortcut icon" id="ikon" type="image/png" href="/img/ulakLogo.png">
     <title id="title">Sinaps Ulak</title>
 </head>
 
@@ -33,18 +34,35 @@
                 <span id="sayac" style="color: white;display: none;float: right;">
                     <label id="minutes">00</label>:<label id="seconds">00</label>
                 </span>
-            </div>            
-            <form id="chat-form">
-                <input id="msg" type="text" list="list" class="input-group" placeholder="Mesajınızı Giriniz" required autocomplete="off" onfocus="baglantiKontrol();" />
+            </div>
+            <form id="chat-form"> 
+                <input id="msg" type="text" list="list" name="liste" class="input-group" placeholder="Mesajınızı Giriniz" required autocomplete="on"  onfocus="baglantiKontrol();" />
                 <input style="display:none;" id="dosya" class="form-control input-group" type="file" />
                 <label for="dosya" class="btn btn-light"><i class="fas fa-paperclip"></i></label>
                 <button id="btnStart" type="button" class="btn btn-light" onclick=""><i class="fas fa-microphone-alt"></i></button>
                 <button class="btn btn-light" type="submit"><i class="fas fa-paper-plane"></i></button>
+                <input type="hidden" name="answer" id="msg-hidden">
             </form>
             <datalist id="list">
-                <option>Wireles Çalışmıyor</option>
-                <option>Barkod Okuyucu Çalışmıyor</option>
-                <option>Oldu Mu?</option>
+                <option data-keys="wireless">Wireless Çalışmıyor</option>
+                <option data-keys="barkod">Barkod Okuyucu Çalışmıyor</option>
+                <option data-keys="pc">Bilgisayar Açılmıyor</option>
+                <option data-keys="tarih">Tarih-Saat Yanlış</option>
+                <option data-keys="elektrik">Elektrik Yok</option>
+                <option data-keys="priz">Prizde Arıza Var</option>
+                <option data-keys="firefox">Firefox Uygulaması Açılmıyor</option>
+                <option data-keys="klavye">Dokunmatik Klavye Açılmıyor</option>
+                <option data-keys="ekran">Ekranda Siyah Bölge Var</option>
+                <option data-keys="dokunmatik">Dokunmatik Çalışmıyor</option>
+                <option data-keys="titreme">Ekranda Titreme Var</option>
+                <option data-keys="mavi">Mavi Ekran Var</option>
+                <option data-keys="windows">Windows Güncelleme Yapıyor</option>
+                <option data-keys="adicomp">Standart Dışı Adicomp</option>
+                <option data-keys="android">Android İşletim Sistemi Açılmış</option>
+                <option data-keys="sifre">Şifremi Unuttum</option>
+                <option data-keys="sketch">Sketch Görünmüyor</option>
+                <option data-keys="ad">AD Görünmüyor</option>
+                <option data-keys="operator-adi">Operatör Adları Gözükmüyor</option>
             </datalist>
         </div>
         <!--for record-->
@@ -54,6 +72,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/ses.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/sweetalert2.all.min.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/sweetalert-dev.min.js"></script>
 </body>
 
 </html>

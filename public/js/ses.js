@@ -60,16 +60,6 @@ navigator.mediaDevices.getUserMedia(audioIN)
                 .createObjectURL(mediaStreamObj);
         }
 
-        // It will play the audio 
-        /*audio.onloadedmetadata = function (ev) { 
-  
-          // Play the audio in the 2nd audio 
-          // element what is being recorded 
-          audio.play(); 
-        }; */
-
-
-
         // Stop record 
         let stop = document.getElementById('btnStop');
 
@@ -84,7 +74,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
 
         // Start event 
         start.addEventListener('click', function(ev) {
-            //sayac.style.display = "none";
+            
         })
         start.addEventListener('touchstart', function(ev) {
             start.style.color = "red";
@@ -94,7 +84,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
             clearInterval(myVar);
             myVar = setInterval(setTime, 1000);
             mediaRecorder.start();
-            // console.log(mediaRecorder.state); 
+             
         })
         start.addEventListener('mousedown', function(ev) {
             start.style.color = "red";
@@ -104,7 +94,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
             clearInterval(myVar);
             myVar = setInterval(setTime, 1000);
             mediaRecorder.start();
-            // console.log(mediaRecorder.state); 
+             
         })
 
         // Stop event 
@@ -115,7 +105,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
             clearInterval(myVar);
             totalSeconds = 0;
             sayac.style.display = "none";
-            // console.log(mediaRecorder.state); 
+             
         });
         start.addEventListener('touchend', function(ev) {
             mediaRecorder.stop();
@@ -124,7 +114,7 @@ navigator.mediaDevices.getUserMedia(audioIN)
             clearInterval(myVar);
             totalSeconds = 0;
             sayac.style.display = "none";
-            // console.log(mediaRecorder.state); 
+             
         });
         start.addEventListener('mouseleave', function(ev) {
             mediaRecorder.stop();
@@ -133,13 +123,11 @@ navigator.mediaDevices.getUserMedia(audioIN)
             clearInterval(myVar);
             totalSeconds = 0;
             sayac.style.display = "none";
-            // console.log(mediaRecorder.state); 
         });
 
         // Play event 
         playAudio.addEventListener('click', function(ev) {
             audio.play();
-            // console.log(mediaRecorder.state); 
         });
 
         // If audio data available then push  
@@ -154,7 +142,6 @@ navigator.mediaDevices.getUserMedia(audioIN)
         // Convert the audio data in to blob  
         // after stopping the recording 
         mediaRecorder.onstop = function(ev) {
-            //if(audio.duration>=1 && audio.duration!=Infinity){
             // blob of type mp3 
             let audioData = new Blob(dataArray, { 'type': 'audio/mp3;' });
             // After fill up the chunk  
@@ -166,13 +153,6 @@ navigator.mediaDevices.getUserMedia(audioIN)
             let audioSrc = window.URL
                 .createObjectURL(audioData);
             blob2base64(audioData);
-            // Pass the audio url to the 2nd video tag 
-            //playAudio.src = blob2base64(audioData);
-            //playAudio.setAttribute("controls", "");
-
-            // Emit message to server
-            // socket.emit('chatMessage', playAudio.outerHTML);
-            //}
         }
     })
 
@@ -189,6 +169,7 @@ function blob2base64(superBuffer) {
         base64 = reader.result;
         base64 = base64.split(',')[1];
         playAudio.src = "data:audio/mp3;base64," + base64;
+        playAudio.classList.add("img-fluid");
         playAudio.setAttribute("controls", "");
         await sleep(300);
         playAudio.setAttribute("preload", "metadata");

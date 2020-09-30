@@ -9,12 +9,18 @@ const $italik = document.getElementById('italik');
 var boldMu = false;
 var italikMi = false;
 let mesajSahibi;
-let saatFormat;
+let foc = true;
+focusMu();
+let tarih = new Date();
+let saatFormat = tarih.toLocaleTimeString();
+//var keyStore = ["wireless", "pc", "elektrik", "tarih", "priz", "firefox", "ekran", "dokunmatik", "titreme", "mavi", "kirmizi", "windows", "android", "sketch", "sifre", "ad", "barkod"];
 var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
 link.type = 'image/x-icon';
 link.rel = 'shortcut icon';
 document.getElementsByTagName('head')[0].appendChild(link);
 let intv = undefined;
+
+
 // Get username and room from URL
 const {
     username,
@@ -28,10 +34,13 @@ window.onerror = function(error) {
     console.log("Hata:" + error);
     //location.href="https://120.120.16.151:3000/";
 };
-window.onfocus = function() {
+window.addEventListener("focus", winFocus);
+
+function winFocus() {
     clearInterval(intv);
     document.title = "Sinaps Ulak";
     link.href = '/img/ulakLogo.png';
+    console.log("focuss");
     intv = undefined;
     //socket.emit('chatMessage', "Görüldü");
 };
@@ -67,37 +76,29 @@ chatForm.addEventListener('submit', e => {
 
     if (!socket.connected) alert("Disconnect oldunuz");
     // Get message text
-    let msg = e.target.elements.msg.value;
+    let el = document.getElementById("msg");
+    let msg = el.value;
     msg = formatKontrol(msg);
-    // Emit message to server
-    socket.emit('chatMessage', msg);
+    keySorgula(msg);
 
-    // Clear input
-    e.target.elements.msg.value = '';
-    e.target.elements.msg.focus();
 });
 
-/*socket.on('error',function(){
-  location.href="https://120.120.16.151:3000/";
-})*/
-// Output message to DOM
 function outputMessage(message) {
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add('meta');
     mesajSahibi = message.username;
-    console.log("Mesajın:" + message.text);
-    //message.text=toggleItalik(message.text);
-    console.log("ms: " + mesajSahibi);
+    //console.log("Mesajın:" + message.text);
+    //console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
         div.innerHTML = '<p class="meta" style="text-align:right">' + message.username + '<span style="text-align:right">' + message.time + '</span></p><p class="text" style="text-align:right">' +
             message.text + '</p>';
     } else {
-        div.innerHTML = '<p class="meta">'+message.username+'<span>'+message.time+'</span></p><p class="text">'+message.text+'</p>';
+        div.innerHTML = '<p class="meta">' + message.username + '<span>' + message.time + '</span></p><p class="text">' + message.text + '</p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
-    if (!document.hasFocus() && !messageOwnerControl(message.username)) {
+    if (!focusMu() && !messageOwnerControl(message.username)) {
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
@@ -109,6 +110,15 @@ function outputMessage(message) {
     };
     boldMu = false;
     italikMi = false;
+}
+
+function focusMu() {
+    if (document.hasFocus()) {
+        foc = true;
+    } else {
+        foc = false;
+    }
+    return foc;
 }
 
 function messageOwnerControl(mUsername) {
@@ -164,7 +174,7 @@ window.ononline = (event) => {
 var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 Notification.requestPermission(function(permission) {});
 socket.on('show_notification', function(data) {
-      if (username != data.title && userList.textContent.includes(data.title)) {
+    if (username != data.title && userList.textContent.includes(data.title) && !focusMu()) {
         if (data.message.includes("<img")) {
             showDesktopNotification(data.title, "1 Yeni Resim Alındı", data.icon);
         } else if (data.message.includes("<video")) {
@@ -316,4 +326,76 @@ function formatKontrol(argument) {
     }
     return argument;
 
+}
+
+var sonuc;
+
+function keySorgula(arg) {
+    var input = document.getElementById("msg"), //e.target
+        list = input.getAttribute('list'),
+        options = document.querySelectorAll('#' + list + ' option'),
+        sonuc,
+        label = input.value;
+
+    //GERİ DÖNÜŞ NOKTASI
+    for (var k = 0; k < options.length; k++) {
+        var option = options[k];
+        var bulunduMu = false;
+        if (option.innerText === label) {
+            bulunduMu = true;
+            sonuc = option.getAttribute('data-keys');
+            arg = { username: "Sinaps Ulak", text: 'Sorununuz için aşağıdaki çözümü deneyebilirsiniz.<br><a target="_blank" href="sorun-cozum.html#' + sonuc + '">Çözüm İçin Tıklayınız</a>', time: saatFormat }
+            outputMessage(arg);
+            // Clear input
+            input.value = '';
+            input.focus();
+            // Scroll down
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            /*
+                        swal({
+                                title: "Yükleniyor...",
+                                text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
+                                imageUrl: '/img/loading.gif',
+                                imageWidth: 200,
+                                imageHeight: 200,
+                                imageAlt: 'Sinaps Ulak',
+                                animation: true,
+                                showCancelButton: true,
+                                confirmButtonColor: "#0c8383",
+                                confirmButtonText: "Tamam",
+                                cancelButtonText: "İptal",
+                                closeOnConfirm: false,
+                                closeOnCancel: true
+                            },
+                            function(inputValue) {
+                                //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
+                                if (inputValue === true) {
+                                    swal.close();
+                                    // Clear input
+                                    input.value = '';
+                                    setTimeout(() => { 
+                                    window.open('sorun-cozum.html#'+ sonuc, '_blank'); }, 0);
+                                } else {
+                                    // Emit message to server
+                                    socket.emit('chatMessage', arg);
+
+                                    // Clear input
+                                    input.value = '';
+                                    input.focus();
+                                }
+                                window.addEventListener("focus", winFocus);
+                            });*/
+            break;
+        }
+    }
+    if (!bulunduMu) {
+        // Emit message to server
+        socket.emit('chatMessage', arg);
+
+        // Clear input
+        input.value = '';
+        input.focus();
+        sonuc = false;
+    }
+    return;
 }
