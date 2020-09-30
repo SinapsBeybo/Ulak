@@ -9,7 +9,10 @@ const $italik = document.getElementById('italik');
 var boldMu = false;
 var italikMi = false;
 let mesajSahibi;
-let saatFormat;
+let foc = true;
+focusMu();
+let tarih = new Date();
+let saatFormat = tarih.toLocaleTimeString();
 //var keyStore = ["wireless", "pc", "elektrik", "tarih", "priz", "firefox", "ekran", "dokunmatik", "titreme", "mavi", "kirmizi", "windows", "android", "sketch", "sifre", "ad", "barkod"];
 var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
 link.type = 'image/x-icon';
@@ -31,10 +34,13 @@ window.onerror = function(error) {
     console.log("Hata:" + error);
     //location.href="https://120.120.16.151:3000/";
 };
-window.onfocus = function() {
+window.addEventListener("focus", winFocus);
+
+function winFocus() {
     clearInterval(intv);
     document.title = "Sinaps Ulak";
     link.href = '/img/ulakLogo.png';
+    console.log("focuss");
     intv = undefined;
     //socket.emit('chatMessage', "Görüldü");
 };
@@ -70,32 +76,20 @@ chatForm.addEventListener('submit', e => {
 
     if (!socket.connected) alert("Disconnect oldunuz");
     // Get message text
-    //let msg = e.target.elements.msg.value;
     let el = document.getElementById("msg");
     let msg = el.value;
     msg = formatKontrol(msg);
     keySorgula(msg);
-    /* //Emit message to server
-    socket.emit('chatMessage', msg);
-
-    // Clear input
-    el.value = '';
-    el.focus();*/
 
 });
 
-/*socket.on('error',function(){
-  location.href="https://120.120.16.151:3000/";
-})*/
-// Output message to DOM
 function outputMessage(message) {
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add('meta');
     mesajSahibi = message.username;
-    console.log("Mesajın:" + message.text);
-    //message.text=toggleItalik(message.text);
-    console.log("ms: " + mesajSahibi);
+    //console.log("Mesajın:" + message.text);
+    //console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
         div.innerHTML = '<p class="meta" style="text-align:right">' + message.username + '<span style="text-align:right">' + message.time + '</span></p><p class="text" style="text-align:right">' +
@@ -104,7 +98,7 @@ function outputMessage(message) {
         div.innerHTML = '<p class="meta">' + message.username + '<span>' + message.time + '</span></p><p class="text">' + message.text + '</p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
-    if (!document.hasFocus() && !messageOwnerControl(message.username)) {
+    if (!focusMu() && !messageOwnerControl(message.username)) {
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
@@ -116,6 +110,15 @@ function outputMessage(message) {
     };
     boldMu = false;
     italikMi = false;
+}
+
+function focusMu() {
+    if (document.hasFocus()) {
+        foc = true;
+    } else {
+        foc = false;
+    }
+    return foc;
 }
 
 function messageOwnerControl(mUsername) {
@@ -171,7 +174,7 @@ window.ononline = (event) => {
 var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 Notification.requestPermission(function(permission) {});
 socket.on('show_notification', function(data) {
-    if (username != data.title && userList.textContent.includes(data.title)) {
+    if (username != data.title && userList.textContent.includes(data.title) && !focusMu()) {
         if (data.message.includes("<img")) {
             showDesktopNotification(data.title, "1 Yeni Resim Alındı", data.icon);
         } else if (data.message.includes("<video")) {
@@ -328,7 +331,6 @@ function formatKontrol(argument) {
 var sonuc;
 
 function keySorgula(arg) {
-    //document.querySelector('input[list]').addEventListener('input', function(e) {
     var input = document.getElementById("msg"), //e.target
         list = input.getAttribute('list'),
         options = document.querySelectorAll('#' + list + ' option'),
@@ -338,219 +340,62 @@ function keySorgula(arg) {
     //GERİ DÖNÜŞ NOKTASI
     for (var k = 0; k < options.length; k++) {
         var option = options[k];
-        var bulunduMu=false;
+        var bulunduMu = false;
         if (option.innerText === label) {
-            bulunduMu=true;
+            bulunduMu = true;
             sonuc = option.getAttribute('data-keys');
-
-            swal({
-                    title: "Yükleniyor...",
-                    text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
-                    imageUrl: '/img/loading.gif',
-                    imageWidth: 200,
-                    imageHeight: 200,
-                    imageAlt: 'Sinaps Ulak',
-                    animation: true,
-                    showCancelButton: true,
-                    confirmButtonColor: "#0c8383",
-                    confirmButtonText: "Tamam",
-                    cancelButtonText: "İptal",
-                    closeOnConfirm: false,
-                    closeOnCancel: true
-                },
-                function(inputValue) {
-                    //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
-                    if (inputValue === true) {
-                        setTimeout(() => { location.href = "sorun-cozum.html#" + sonuc; }, 0);
-                    } else {
-                        // Emit message to server
-                        socket.emit('chatMessage', arg);
-
-                        // Clear input
-                        input.value = '';
-                        input.focus();
-                    }
-                });
-            break;
-        } 
-   } 
-   if(!bulunduMu){
-            // Emit message to server
-            socket.emit('chatMessage', arg);
-
+            arg = { username: "Sinaps Ulak", text: 'Sorununuz için aşağıdaki çözümü deneyebilirsiniz.<br><a target="_blank" href="sorun-cozum.html#' + sonuc + '">Çözüm İçin Tıklayınız</a>', time: saatFormat }
+            outputMessage(arg);
             // Clear input
             input.value = '';
             input.focus();
-            sonuc = false;
-            }
-return;
-}
+            // Scroll down
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            /*
+                        swal({
+                                title: "Yükleniyor...",
+                                text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
+                                imageUrl: '/img/loading.gif',
+                                imageWidth: 200,
+                                imageHeight: 200,
+                                imageAlt: 'Sinaps Ulak',
+                                animation: true,
+                                showCancelButton: true,
+                                confirmButtonColor: "#0c8383",
+                                confirmButtonText: "Tamam",
+                                cancelButtonText: "İptal",
+                                closeOnConfirm: false,
+                                closeOnCancel: true
+                            },
+                            function(inputValue) {
+                                //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
+                                if (inputValue === true) {
+                                    swal.close();
+                                    // Clear input
+                                    input.value = '';
+                                    setTimeout(() => { 
+                                    window.open('sorun-cozum.html#'+ sonuc, '_blank'); }, 0);
+                                } else {
+                                    // Emit message to server
+                                    socket.emit('chatMessage', arg);
 
-//Yeni DÖNÜŞ NOKTASI
-/*
-
-var count = 1;
-var group = document.getElementById('slg');
-var list_group = group.querySelector('li ul');
-var list_array = group.querySelectorAll('li ul li');
-var search = group.getElementsByTagName('input')[0];
-
-search.addEventListener('input', function(e) {
-    for (var i = 0; i < list_array.length; i++) {
-        matching(list_array[i])
-    }
-    show_list(list_group);
-    key_up_down();
-});
-
-search.addEventListener('click', function(e) {
-    init_list();
-    show_list(list_group);
-    key_up_down();
-});
-
-search.addEventListener('keypress', function(e) {
-    if (e.keyCode == 13) {
-        e.target.value = list_group.querySelector('[data-highlight="true"]').innerHTML
-    }
-    hide_list(list_group)
-    init_list();
-});
-
-function matching(item) {
-    var str = new RegExp(search.value, 'gi');
-    if (item.innerHTML.match(str)) {
-        item.dataset.display = 'true'
-    } else {
-        item.dataset.display = 'false';
-        item.dataset.highlight = 'false';
-        count = 0
-    }
-}
-
-function init_list() {
-    count = 0;
-    for (var i = 0; i < list_array.length; i++) {
-        init_item(list_array[i]);
-        list_array[i].addEventListener('click', copy_paste);
-    }
-}
-
-function init_item(item) {
-    item.dataset.display = 'true';
-    item.dataset.highlight = 'false';
-}
-
-function copy_paste() {
-    search.value = this.innerHTML;
-    // todo : check match of list text and input value for .current 
-    init_list();
-    hide_list(list_group);
-}
-
-function hide_list(ele) {
-    ele.dataset.toggle = 'false'
-}
-
-function show_list(ele) {
-    ele.dataset.toggle = 'true'
-}
-
-function key_up_down() {
-
-    var items = group.querySelectorAll('li[data-display="true"]');
-    var last = items[items.length - 1];
-    var first = items[0];
-
-    search.onkeydown = function(e) {
-
-        if (e.keyCode === 38) {
-            count--;
-            count = count <= 0 ? items.length : count;
-            items[count - 1].dataset.highlight = items[count - 1] ? 'true' : 'false';
-            if (items[count]) {
-                items[count].dataset.highlight = 'false';
-            } else {
-                first.dataset.highlight = 'false';
-            }
+                                    // Clear input
+                                    input.value = '';
+                                    input.focus();
+                                }
+                                window.addEventListener("focus", winFocus);
+                            });*/
+            break;
         }
-
-        if (e.keyCode === 40) {
-            items[count].dataset.highlight = items[count] ? 'true' : 'false';
-            if (items[count - 1]) {
-                items[count - 1].dataset.highlight = 'false';
-            } else {
-                last.dataset.highlight = 'false';
-            }
-            count++;
-            count = count >= items.length ? 0 : count;
-        }
-    };
-}
-
-group.addEventListener('mouseleave', function(event) {
-    if (event.target != list_group && event.target.parentNode != list_group) {
-        list_group.dataset.toggle = 'false'
     }
-});
+    if (!bulunduMu) {
+        // Emit message to server
+        socket.emit('chatMessage', arg);
 
-*/
-
-
-
-/*
-hiddenInput.value = label;
-
-for (var k = 0; k < options.length; k++) {
-    var option = options[k];
-
-    if (option.innerText === label) {
-        hiddenInput.value = option.getAttribute('data-keys');
-
-        for (var i = 0; i < keyStore.length; i++) {
-            if (hiddenInput.value.includes(keyStore[i])) {
-                sonuc = keyStore[i];
-                swal({
-                        title: "Yükleniyor...",
-                        text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
-                        imageUrl: '/img/loading.gif',
-                        imageWidth: 200,
-                        imageHeight: 200,
-                        imageAlt: 'Sinaps Ulak',
-                        animation: true,
-                        showCancelButton: true,
-                        confirmButtonColor: "#0c8383",
-                        confirmButtonText: "Tamam",
-                        cancelButtonText: "İptal",
-                        closeOnConfirm: false,
-                        closeOnCancel: true
-                    },
-                    function(inputValue) {
-                        //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
-                        if (inputValue === true) {
-                            setTimeout(() => { location.href = "sorun-cozum.html#" + sonuc; }, 0);
-                        } else {
-                            // Emit message to server
-                            socket.emit('chatMessage', arg);
-
-                            // Clear input
-                            input.value = '';
-                            input.focus();
-                        }
-                    });
-                break;
-            } else {
-                // Emit message to server
-                socket.emit('chatMessage', arg);
-
-                // Clear input
-                input.value = '';
-                input.focus();
-                sonuc = false;
-            }
-        }
-
+        // Clear input
+        input.value = '';
+        input.focus();
+        sonuc = false;
     }
+    return;
 }
-return sonuc;
-});*/
