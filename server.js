@@ -64,6 +64,14 @@ io.on('connection', socket => {
         });
     });
 
+    socket.on('goz',msg=>{
+        socket.broadcast
+            .emit(
+                'gorme',
+                true
+            );
+    })
+
     // Listen for chatMessage
     socket.on('chatMessage', msg => {
         const tarih = new Date();
@@ -102,6 +110,8 @@ io.on('connection', socket => {
             });
         }
     });
+
+    
     //socket.emit('reconnect_attempt');
 });
 
@@ -109,5 +119,3 @@ io.on('connection', socket => {
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-//Notification Geri Dönüş Boktası

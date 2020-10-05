@@ -10,7 +10,9 @@ var boldMu = false;
 var italikMi = false;
 let mesajSahibi;
 let foc = true;
+const socket = io();
 focusMu();
+//gor();
 let tarih = new Date();
 let saatFormat = tarih.toLocaleTimeString();
 //var keyStore = ["wireless", "pc", "elektrik", "tarih", "priz", "firefox", "ekran", "dokunmatik", "titreme", "mavi", "kirmizi", "windows", "android", "sketch", "sifre", "ad", "barkod"];
@@ -20,7 +22,6 @@ link.rel = 'shortcut icon';
 document.getElementsByTagName('head')[0].appendChild(link);
 let intv = undefined;
 
-
 // Get username and room from URL
 const {
     username,
@@ -29,7 +30,7 @@ const {
     ignoreQueryPrefix: true
 });
 
-const socket = io();
+
 window.onerror = function(error) {
     console.log("Hata:" + error);
     //location.href="https://120.120.16.151:3000/";
@@ -42,8 +43,13 @@ function winFocus() {
     link.href = '/img/ulakLogo.png';
     console.log("focuss");
     intv = undefined;
-    //socket.emit('chatMessage', "Görüldü");
+    socket.emit(
+        'goz',
+        "Görüldü"
+    );
 };
+
+
 // Join chatroom
 socket.emit('joinRoom', {
     username,
@@ -65,9 +71,17 @@ socket.on('message', message => {
     console.log(message);
     outputMessage(message);
 
+    //gorulduMu();
     // Scroll down
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+
+socket.on('gorme', arg => {
+    let eye = document.getElementsByClassName("fa-eye");
+    for (var i = 0; i < eye.length; i++) {
+        eye[i].style.color = "blue";
+    }
+})
 
 
 // Message submit
@@ -92,13 +106,14 @@ function outputMessage(message) {
     //console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
-        div.innerHTML = '<p class="meta" style="text-align:right">' + message.username + '<span style="text-align:right">' + message.time + '</span></p><p class="text" style="text-align:right">' +
+        div.innerHTML = '<p class="meta" style="text-align:right"><i class="fas fa-eye" style="color:white"></i> ' + message.username + ' <span style="text-align:right"> ' + message.time + ' </span></p><p class="text" style="text-align:right"> ' +
             message.text + '</p>';
     } else {
-        div.innerHTML = '<p class="meta">' + message.username + '<span>' + message.time + '</span></p><p class="text">' + message.text + '</p>';
+        div.innerHTML = '<p class="meta"> ' + message.username + ' <span> ' + message.time + ' </span></p><p class="text"> ' + message.text + ' </p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
     if (!focusMu() && !messageOwnerControl(message.username)) {
+
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
@@ -110,11 +125,19 @@ function outputMessage(message) {
     };
     boldMu = false;
     italikMi = false;
+    console.log("m128:"+ focusMu());
+    if(focusMu()){
+        socket.emit(
+        'goz',
+        "Görüldü"
+    );
+    }
 }
 
 function focusMu() {
     if (document.hasFocus()) {
         foc = true;
+
     } else {
         foc = false;
     }
@@ -225,7 +248,7 @@ function showDesktopNotification(message, body, icon, sound, timeout) {
         }
     );
     instance.onclick = function() {
-        // Something to do
+        
     };
     instance.onerror = function() {
         // Something to do
@@ -351,40 +374,6 @@ function keySorgula(arg) {
             input.focus();
             // Scroll down
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            /*
-                        swal({
-                                title: "Yükleniyor...",
-                                text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
-                                imageUrl: '/img/loading.gif',
-                                imageWidth: 200,
-                                imageHeight: 200,
-                                imageAlt: 'Sinaps Ulak',
-                                animation: true,
-                                showCancelButton: true,
-                                confirmButtonColor: "#0c8383",
-                                confirmButtonText: "Tamam",
-                                cancelButtonText: "İptal",
-                                closeOnConfirm: false,
-                                closeOnCancel: true
-                            },
-                            function(inputValue) {
-                                //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
-                                if (inputValue === true) {
-                                    swal.close();
-                                    // Clear input
-                                    input.value = '';
-                                    setTimeout(() => { 
-                                    window.open('sorun-cozum.html#'+ sonuc, '_blank'); }, 0);
-                                } else {
-                                    // Emit message to server
-                                    socket.emit('chatMessage', arg);
-
-                                    // Clear input
-                                    input.value = '';
-                                    input.focus();
-                                }
-                                window.addEventListener("focus", winFocus);
-                            });*/
             break;
         }
     }
@@ -399,3 +388,10 @@ function keySorgula(arg) {
     }
     return;
 }
+
+/*window.addEventListener("focus", () => {
+socket.emit(
+                'goz',
+                "Görüldü"
+            );
+    });*/
