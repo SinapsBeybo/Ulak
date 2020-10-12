@@ -6,11 +6,13 @@ const ikon = document.getElementById('ikon').href;
 const dosyaSec = document.getElementById('dosya');
 const $kalin = document.getElementById('bold');
 const $italik = document.getElementById('italik');
+//const fs = require('fs');
 var boldMu = false;
 var italikMi = false;
 let mesajSahibi;
 let foc = true;
 focusMu();
+//gor();
 let tarih = new Date();
 let saatFormat = tarih.toLocaleTimeString();
 //var keyStore = ["wireless", "pc", "elektrik", "tarih", "priz", "firefox", "ekran", "dokunmatik", "titreme", "mavi", "kirmizi", "windows", "android", "sketch", "sifre", "ad", "barkod"];
@@ -20,7 +22,6 @@ link.rel = 'shortcut icon';
 document.getElementsByTagName('head')[0].appendChild(link);
 let intv = undefined;
 
-
 // Get username and room from URL
 const {
     username,
@@ -28,6 +29,7 @@ const {
 } = Qs.parse(location.search, {
     ignoreQueryPrefix: true
 });
+
 
 const socket = io();
 window.onerror = function(error) {
@@ -42,8 +44,13 @@ function winFocus() {
     link.href = '/img/ulakLogo.png';
     console.log("focuss");
     intv = undefined;
-    //socket.emit('chatMessage', "Görüldü");
+    socket.emit(
+        'goz',
+        "Görüldü"
+    );
 };
+
+
 // Join chatroom
 socket.emit('joinRoom', {
     username,
@@ -65,9 +72,17 @@ socket.on('message', message => {
     console.log(message);
     outputMessage(message);
 
+    //gorulduMu();
     // Scroll down
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+
+socket.on('gorme', arg => {
+    let eye = document.getElementsByClassName("fa-eye");
+    for (var i = 0; i < eye.length; i++) {
+        eye[i].style.color = "blue";
+    }
+})
 
 
 // Message submit
@@ -84,21 +99,38 @@ chatForm.addEventListener('submit', e => {
 });
 
 function outputMessage(message) {
+    let tarih = new Date();
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add('meta');
+
     mesajSahibi = message.username;
     //console.log("Mesajın:" + message.text);
     //console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
-        div.innerHTML = '<p class="meta" style="text-align:right">' + message.username + '<span style="text-align:right">' + message.time + '</span></p><p class="text" style="text-align:right">' +
-            message.text + '</p>';
+        div.innerHTML = '<p class="meta"><i class="fas fa-eye" style="color:white"></i> ' + message.username + ' <span> ' + message.time + ' </span></p><p class="text"> ' + message.text + ' </p>';
     } else {
-        div.innerHTML = '<p class="meta">' + message.username + '<span>' + message.time + '</span></p><p class="text">' + message.text + '</p>';
+        div.innerHTML = '<p class="meta"> ' + message.username + ' <span> ' + message.time + ' </span></p><p class="text"> ' + message.text + ' </p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
+    let myData = {
+        sender: message.username,
+        zaman: message.time,
+        icerik: message.text,
+        vakit: tarih,
+        birimAdi: room
+    };
+    if (localStorage.getItem("eskiMesaj") == null) {
+        let arrayData = new Array(myData);
+        localStorage.setItem("eskiMesaj", JSON.stringify(arrayData));
+    } else {
+        let newData = JSON.parse(localStorage.getItem("eskiMesaj"));
+        newData.push(myData);
+        localStorage.setItem("eskiMesaj", JSON.stringify(newData));
+    }
     if (!focusMu() && !messageOwnerControl(message.username)) {
+
         a = true;
         if (intv == undefined) intv = setInterval(() => {
 
@@ -110,11 +142,67 @@ function outputMessage(message) {
     };
     boldMu = false;
     italikMi = false;
+    if (focusMu()) {
+        socket.emit(
+            'goz',
+            "Görüldü"
+        );
+    }
+}
+localdenGetir();
+
+function localdenGetir() {
+    let bot = "Sinaps Ulak";
+    let eskiMesaj = localStorage.getItem("eskiMesaj");
+    eskiMesaj = JSON.parse(eskiMesaj);
+    let bugun = new Date();
+    if (eskiMesaj == null) return;
+    if (eskiMesaj.length > 0) {
+        let silinecekler = [];
+        for (var i = 0; i < eskiMesaj.length; i++) {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.classList.add('meta');
+            let eskiMesajSender = eskiMesaj[i].sender;
+            let eskiMesajZaman = eskiMesaj[i].zaman;
+            let eskiMesajIcerik = eskiMesaj[i].icerik;
+            let eskiMesajTarih = new Date(eskiMesaj[i].vakit);
+            let eskiMesajBirim = eskiMesaj[i].birimAdi;
+            if (room == eskiMesajBirim) {
+                if (bugun.getTime() <= eskiMesajTarih.getTime() + (7 * 24 * 3600 * 1000)) {
+                    if (messageOwnerControl(eskiMesaj[i].sender)) {
+                        div.classList.add('alici');
+                        div.innerHTML = '<p class="meta"> ' + eskiMesajSender + ' <span> ' + eskiMesajZaman + ' </span></p><p class="text"> ' + eskiMesajIcerik + ' </p>';
+                        document.querySelector('.chat-messages').appendChild(div);
+                    } else if (eskiMesaj[i].sender == bot) {} else {
+                        div.innerHTML = '<p class="meta"> ' + eskiMesajSender + ' <span> ' + eskiMesajZaman + ' </span></p><p class="text"> ' + eskiMesajIcerik + ' </p>';
+                        document.querySelector('.chat-messages').appendChild(div);
+                    }
+                } else if (bugun.getTime() > eskiMesajTarih.getTime() + (7 * 24 * 3600 * 1000)) {
+
+                    silinecekler.push(eskiMesaj[i]);
+
+                }
+            }
+        }
+        for (var j = silinecekler.length - 1; j >= 0; j--) {
+            //remove item selected, second parameter is the number of items to delete 
+            eskiMesaj.splice(silinecekler[j], 1);
+        }
+        // Put the object into storage
+        localStorage.setItem('eskiMesaj', JSON.stringify(eskiMesaj));
+        const hr = document.createElement('hr');
+        hr.style.height = "10px";
+        document.querySelector('.chat-messages').appendChild(hr);
+        // Scroll down
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 }
 
 function focusMu() {
     if (document.hasFocus()) {
         foc = true;
+
     } else {
         foc = false;
     }
@@ -225,7 +313,7 @@ function showDesktopNotification(message, body, icon, sound, timeout) {
         }
     );
     instance.onclick = function() {
-        // Something to do
+
     };
     instance.onerror = function() {
         // Something to do
@@ -351,40 +439,6 @@ function keySorgula(arg) {
             input.focus();
             // Scroll down
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            /*
-                        swal({
-                                title: "Yükleniyor...",
-                                text: "Doğrudan Çözüm Sayfasına Gitmek İçin Lütfen Tamam'a basın",
-                                imageUrl: '/img/loading.gif',
-                                imageWidth: 200,
-                                imageHeight: 200,
-                                imageAlt: 'Sinaps Ulak',
-                                animation: true,
-                                showCancelButton: true,
-                                confirmButtonColor: "#0c8383",
-                                confirmButtonText: "Tamam",
-                                cancelButtonText: "İptal",
-                                closeOnConfirm: false,
-                                closeOnCancel: true
-                            },
-                            function(inputValue) {
-                                //Use the "Strict Equality Comparison" to accept the user's input "false" as string)
-                                if (inputValue === true) {
-                                    swal.close();
-                                    // Clear input
-                                    input.value = '';
-                                    setTimeout(() => { 
-                                    window.open('sorun-cozum.html#'+ sonuc, '_blank'); }, 0);
-                                } else {
-                                    // Emit message to server
-                                    socket.emit('chatMessage', arg);
-
-                                    // Clear input
-                                    input.value = '';
-                                    input.focus();
-                                }
-                                window.addEventListener("focus", winFocus);
-                            });*/
             break;
         }
     }
@@ -399,3 +453,42 @@ function keySorgula(arg) {
     }
     return;
 }
+/*gecmisiGoster();
+
+ function gecmisiGoster()
+{
+var odaAdi=roomName.innerText;
+    const tarih = new Date();
+        const ay = tarih.getMonth() + 1;
+    /*var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "", false);
+    console.log("Oda Adı:"+room);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                
+            }
+        }
+    }
+    rawFile.send(null);
+
+
+$.ajax({
+    url: "log/log_file_"+room + "-" + tarih.getDate() + "-" + ay + "-" + tarih.getFullYear()+".txt",
+    type: 'GET'
+})
+.done(function(response) {
+    alert(response);
+})
+.fail(function() {
+    console.log("error");
+})
+.always(function() {
+    console.log("complete");
+});
+}
+*/

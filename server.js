@@ -2,10 +2,14 @@ const path = require('path');
 const http = require('https');
 const express = require('express');
 const socketio = require('socket.io');
+const webpush = require("web-push");
+const bodyParser = require("body-parser");
+const app = express();
 const formatMessage = require('./utils/messages');
 const fs = require('fs');
 const moment = require('moment');
 var favicon = require('serve-favicon');
+const botName = 'Sinaps Ulak';
 const https_options = {
     key: fs.readFileSync("./private.key"),
     cert: fs.readFileSync("./certificate.crt")
@@ -17,7 +21,6 @@ const {
     getRoomUsers
 } = require('./utils/users');
 
-const app = express();
 const server = http.createServer(https_options, app);
 /*http.createServer(https_options, function (req, res) {
 
@@ -32,10 +35,10 @@ const io = socketio(server, {
     randomizationFactor: 0.5
 });
 
+
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-const botName = 'Sinaps Ulak';
 
 // Run when client connects
 
@@ -64,10 +67,18 @@ io.on('connection', socket => {
         });
     });
 
+    socket.on('goz', msg => {
+        socket.broadcast
+            .emit(
+                'gorme',
+                true
+            );
+    })
+
     // Listen for chatMessage
     socket.on('chatMessage', msg => {
         const tarih = new Date();
-        const ay=tarih.getMonth()+1;
+        const ay = tarih.getMonth() + 1;
         const user = getCurrentUser(socket.id);
         if (user != null && user != undefined) {
             io.to(user.room).emit('message', formatMessage(user.username, msg));
@@ -102,6 +113,8 @@ io.on('connection', socket => {
             });
         }
     });
+
+
     //socket.emit('reconnect_attempt');
 });
 
@@ -109,5 +122,3 @@ io.on('connection', socket => {
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-//Notification Geri Dönüş Boktası

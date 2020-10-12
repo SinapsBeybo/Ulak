@@ -11,6 +11,7 @@ let totalSeconds = 0;
 let minutesLabel = document.getElementById("minutes");
 let secondsLabel = document.getElementById("seconds");
 let myVar;
+mediaDevicesUtils(); //Bu ikincil işlem CHROME gerekçesiyle yazılmıştır
 
 function setTime() {
     ++totalSeconds;
@@ -27,139 +28,148 @@ function pad(val) {
     }
 }
 
-start.onmousedown = function() {
-    sayac.style.display = "block";
-    secondsLabel.innerHTML = "00";
-    minutesLabel.innerHTML = "00";
-    clearInterval(myVar);
-    myVar = setInterval(setTime, 1000);
-};
+let mediaRecorder, mediaStream;
+window.onblur = (event) => {
+    if (mediaStream != undefined) {
+        tracks = mediaStream.getTracks();
+        tracks.forEach(function(track) {
+            track.stop();
+        });
+        mediaRecorder = null;
+        mediaStream = null;
+    }
+}
+window.onfocus = (event) => { mediaDevicesUtils(); }
 
-start.onmouseup = function() {
-    clearInterval(myVar);
-    totalSeconds = 0;
-    sayac.style.display = "none";
-};
-navigator.mediaDevices.getUserMedia(audioIN)
+function mediaDevicesUtils(argument) {
 
-    // 'then()' method returns a Promise 
-    .then(function(mediaStreamObj) {
 
-        // Connect the media stream to the 
-        // first audio element 
-        let audio = document.getElementById('ses_container');
-        //returns the recorded audio via 'audio' tag 
+    navigator.mediaDevices.getUserMedia(audioIN)
 
-        // 'srcObject' is a property which  
-        // takes the media object 
-        // This is supported in the newer browsers 
-        if ("srcObject" in audio) {
-            audio.srcObject = mediaStreamObj;
-        } else { // Old version 
-            audio.src = window.URL
-                .createObjectURL(mediaStreamObj);
-        }
+        // 'then()' method returns a Promise 
+        .then(function(mediaStreamObj) {
 
-        // Stop record 
-        let stop = document.getElementById('btnStop');
+            start = document.getElementById('btnStart');
+            var newStart = start.cloneNode(true);
+            start.parentNode.replaceChild(newStart, start);
+            start = document.getElementById('btnStart');
+            mediaStream = mediaStreamObj;
+            // Connect the media stream to the 
+            // first audio element 
+            let audio = document.getElementById('ses_container');
+            //returns the recorded audio via 'audio' tag 
 
-        // 2nd audio tag for play the audio 
-        //let playAudio = document.getElementById('adioPlay');
-        playAudio = document.createElement("audio");
+            // 'srcObject' is a property which  
+            // takes the media object 
+            // This is supported in the newer browsers 
+            if ("srcObject" in audio) {
+                audio.srcObject = mediaStreamObj;
+            } else { // Old version 
+                audio.src = window.URL
+                    .createObjectURL(mediaStreamObj);
+            }
 
-        // This is the main thing to recorde  
-        // the audio 'MediaRecorder' API 
-        let mediaRecorder = new MediaRecorder(mediaStreamObj);
-        // Pass the audio stream  
+            // Stop record 
+            let stop = document.getElementById('btnStop');
 
-        // Start event 
-        start.addEventListener('click', function(ev) {
-            
+            // 2nd audio tag for play the audio 
+            //let playAudio = document.getElementById('adioPlay');
+            playAudio = document.createElement("audio");
+
+            // This is the main thing to recorde  
+            // the audio 'MediaRecorder' API 
+            mediaRecorder = new MediaRecorder(mediaStreamObj);
+            // Pass the audio stream  
+
+            // Start event 
+            start.addEventListener('click', function(ev) {
+
+            })
+            start.addEventListener('touchstart', function(ev) {
+                start.style.color = "red";
+                sayac.style.display = "block";
+                secondsLabel.innerHTML = "00";
+                minutesLabel.innerHTML = "00";
+                clearInterval(myVar);
+                myVar = setInterval(setTime, 1000);
+                mediaRecorder.start();
+
+            })
+            start.addEventListener('mousedown', function(ev) {
+                start.style.color = "red";
+                sayac.style.display = "block";
+                secondsLabel.innerHTML = "00";
+                minutesLabel.innerHTML = "00";
+                clearInterval(myVar);
+                myVar = setInterval(setTime, 1000);
+                mediaRecorder.start();
+
+            })
+
+            // Stop event 
+            start.addEventListener('mouseup', function(ev) {
+                mediaRecorder.stop();
+                start.style.color = "black";
+
+                clearInterval(myVar);
+                totalSeconds = 0;
+                sayac.style.display = "none";
+
+            });
+            start.addEventListener('touchend', function(ev) {
+                mediaRecorder.stop();
+                start.style.color = "black";
+
+                clearInterval(myVar);
+                totalSeconds = 0;
+                sayac.style.display = "none";
+
+            });
+            start.addEventListener('mouseleave', function(ev) {
+                mediaRecorder.stop();
+                start.style.color = "black";
+
+                clearInterval(myVar);
+                totalSeconds = 0;
+                sayac.style.display = "none";
+            });
+
+            // Play event 
+            playAudio.addEventListener('click', function(ev) {
+                audio.play();
+            });
+
+            // If audio data available then push  
+            // it to the chunk array 
+            mediaRecorder.ondataavailable = function(ev) {
+                dataArray.push(ev.data);
+            }
+
+            // Chunk array to store the audio data  
+            let dataArray = [];
+
+            // Convert the audio data in to blob  
+            // after stopping the recording 
+            mediaRecorder.onstop = function(ev) {
+                // blob of type mp3 
+                let audioData = new Blob(dataArray, { 'type': 'audio/mp3;' });
+                // After fill up the chunk  
+                // array make it empty 
+                dataArray = [];
+
+                // Creating audio url with reference  
+                // of created blob named 'audioData' 
+                let audioSrc = window.URL
+                    .createObjectURL(audioData);
+                blob2base64(audioData);
+            }
         })
-        start.addEventListener('touchstart', function(ev) {
-            start.style.color = "red";
-            sayac.style.display = "block";
-            secondsLabel.innerHTML = "00";
-            minutesLabel.innerHTML = "00";
-            clearInterval(myVar);
-            myVar = setInterval(setTime, 1000);
-            mediaRecorder.start();
-             
-        })
-        start.addEventListener('mousedown', function(ev) {
-            start.style.color = "red";
-            sayac.style.display = "block";
-            secondsLabel.innerHTML = "00";
-            minutesLabel.innerHTML = "00";
-            clearInterval(myVar);
-            myVar = setInterval(setTime, 1000);
-            mediaRecorder.start();
-             
-        })
 
-        // Stop event 
-        start.addEventListener('mouseup', function(ev) {
-            mediaRecorder.stop();
-            start.style.color = "black";
-
-            clearInterval(myVar);
-            totalSeconds = 0;
-            sayac.style.display = "none";
-             
+        // If any error occurs then handles the error  
+        .catch(function(err) {
+            console.log(err.name, err.message);
         });
-        start.addEventListener('touchend', function(ev) {
-            mediaRecorder.stop();
-            start.style.color = "black";
-
-            clearInterval(myVar);
-            totalSeconds = 0;
-            sayac.style.display = "none";
-             
-        });
-        start.addEventListener('mouseleave', function(ev) {
-            mediaRecorder.stop();
-            start.style.color = "black";
-
-            clearInterval(myVar);
-            totalSeconds = 0;
-            sayac.style.display = "none";
-        });
-
-        // Play event 
-        playAudio.addEventListener('click', function(ev) {
-            audio.play();
-        });
-
-        // If audio data available then push  
-        // it to the chunk array 
-        mediaRecorder.ondataavailable = function(ev) {
-            dataArray.push(ev.data);
-        }
-
-        // Chunk array to store the audio data  
-        let dataArray = [];
-
-        // Convert the audio data in to blob  
-        // after stopping the recording 
-        mediaRecorder.onstop = function(ev) {
-            // blob of type mp3 
-            let audioData = new Blob(dataArray, { 'type': 'audio/mp3;' });
-            // After fill up the chunk  
-            // array make it empty 
-            dataArray = [];
-
-            // Creating audio url with reference  
-            // of created blob named 'audioData' 
-            let audioSrc = window.URL
-                .createObjectURL(audioData);
-            blob2base64(audioData);
-        }
-    })
-
-    // If any error occurs then handles the error  
-    .catch(function(err) {
-        console.log(err.name, err.message);
-    });
+}
 
 function blob2base64(superBuffer) {
 
