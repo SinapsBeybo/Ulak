@@ -11,6 +11,7 @@ let totalSeconds = 0;
 let minutesLabel = document.getElementById("minutes");
 let secondsLabel = document.getElementById("seconds");
 let myVar;
+mediaDevicesUtils(); //Bu ikincil işlem CHROME gerekçesiyle yazılmıştır
 
 function setTime() {
     ++totalSeconds;
@@ -34,12 +35,12 @@ window.onblur = (event) => {
         tracks.forEach(function(track) {
             track.stop();
         });
-        mediaRecorder=null;
-        mediaStream=null;
+        mediaRecorder = null;
+        mediaStream = null;
     }
 }
 window.onfocus = (event) => { mediaDevicesUtils(); }
-mediaDevicesUtils(); //Bu ikincil işlem CHROME gerekçesiyle yazılmıştır
+
 function mediaDevicesUtils(argument) {
 
 
@@ -48,10 +49,10 @@ function mediaDevicesUtils(argument) {
         // 'then()' method returns a Promise 
         .then(function(mediaStreamObj) {
 
-start = document.getElementById('btnStart');
-var newStart = start.cloneNode(true);
-start.parentNode.replaceChild(newStart, start);
-start = document.getElementById('btnStart');
+            start = document.getElementById('btnStart');
+            var newStart = start.cloneNode(true);
+            start.parentNode.replaceChild(newStart, start);
+            start = document.getElementById('btnStart');
             mediaStream = mediaStreamObj;
             // Connect the media stream to the 
             // first audio element 

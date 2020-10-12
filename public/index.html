@@ -1,52 +1,49 @@
 <!DOCTYPE html>
 <html lang="tr">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<link
-			rel="stylesheet"
-			href="css/all.min.css"
-		/>
-		<link rel="stylesheet" href="css/style.css" />
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
-		<link rel="shortcut icon" id="ikon" type="image/png" href="/img/ulakLogo.png">
-		<title>Sinaps Ulak</title>
-	</head>
-	<body>
-		<div class="join-container">
-			<header class="join-header">
-				<img src="/img/ulakLogo.svg" width="72px" height="72px"> 
-				<h2>Sinaps Ulak</h2>
-			</header>
-			<main class="join-main">
-				<form action="chat.html">
-					<div >
-						<label for="username">Kullanıcı Adı</label>
-						<input
-							type="text"
-							name="username"
-							id="username"
-							placeholder="Adınızı Giriniz"
-							class="form-control"
-							required
-						/>
-					</div>
-					<div>
-						<label for="room">Birimler</label>
-						<select name="room" id="room" class="custom-select">
-							<option value="Dijitalleşme">Dijitalleşme</option>
-							<!--<option value="Makina Bakım">Makina Bakım</option>
+    <link rel="shortcut icon" id="ikon" type="image/png" href="/img/ulakLogo.png">
+    <title>Sinaps Ulak</title>
+</head>
+
+<body>
+    <div class="join-container">
+        <header class="join-header">
+            <img src="/img/ulakLogo.svg" width="72px" height="72px">
+            <h2>Sinaps Ulak</h2>
+        </header>
+        <main class="join-main">
+            <form action="chat.html" autocomplete="off">
+                <div>
+                    <label for="username">Kullanıcı Adı</label>
+                    <input list="kisiList" type="text" name="username" id="username" placeholder="Adınızı Giriniz" class="form-control" required />
+                </div>
+                <div>
+                    <label for="room">Birimler</label>
+                    <select name="room" id="room" class="custom-select">
+                        <option value="Dijitalleşme">Dijitalleşme</option>
+                        <!--<option value="Makina Bakım">Makina Bakım</option>
 							<option value="İğne Polisi">İğne Polisi</option>
 							<option value="Sistem Geliştirme">Sistem Geliştirme</option>
 							<option value="Kesim Planlama">Kesim Planlama</option>
 							<option value="Elektrik">Elektrik</option>-->
-						</select>
-					</div>
-					<button type="submit" class="btn btn-light">Konuşmayı Başlat</button>
-				</form>
-			</main>
-		</div>
-	</body>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-light">Konuşmayı Başlat</button>
+            </form>
+            <datalist id="kisiList"></datalist>
+        </main>
+    </div>
+    <script src="js/jQuery.js"></script>
+    <script src="js/datalist.js"></script>
+
+</body>
+</body>
+
 </html>

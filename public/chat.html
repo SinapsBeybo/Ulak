@@ -35,8 +35,8 @@
                     <label id="minutes">00</label>:<label id="seconds">00</label>
                 </span>
             </div>
-            <form id="chat-form"> 
-                <input id="msg" type="text" list="list" name="liste" class="input-group" placeholder="Mesajınızı Giriniz" required autocomplete="on"  onfocus="baglantiKontrol();" />
+            <form id="chat-form" autocomplete="off">
+                <input id="msg" type="text" list="list" name="liste" class="input-group" placeholder="Mesajınızı Giriniz" required onfocus="baglantiKontrol();" />
                 <input style="display:none;" id="dosya" class="form-control input-group" type="file" />
                 <label for="dosya" class="btn btn-light"><i class="fas fa-paperclip"></i></label>
                 <button id="btnStart" type="button" class="btn btn-light" onclick=""><i class="fas fa-microphone-alt"></i></button>
@@ -71,10 +71,11 @@
     <script src="js/qs.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/ses.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/sweetalert2.all.min.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/sweetalert-dev.min.js"></script>
+    <script src="js/jQuery.js"></script>
+    <script src="js/main.js"></script>
 </body>
 
 </html>

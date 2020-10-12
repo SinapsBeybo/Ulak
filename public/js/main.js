@@ -6,11 +6,11 @@ const ikon = document.getElementById('ikon').href;
 const dosyaSec = document.getElementById('dosya');
 const $kalin = document.getElementById('bold');
 const $italik = document.getElementById('italik');
+//const fs = require('fs');
 var boldMu = false;
 var italikMi = false;
 let mesajSahibi;
 let foc = true;
-const socket = io();
 focusMu();
 //gor();
 let tarih = new Date();
@@ -31,6 +31,7 @@ const {
 });
 
 
+const socket = io();
 window.onerror = function(error) {
     console.log("Hata:" + error);
     //location.href="https://120.120.16.151:3000/";
@@ -98,20 +99,36 @@ chatForm.addEventListener('submit', e => {
 });
 
 function outputMessage(message) {
+    let tarih = new Date();
     const div = document.createElement('div');
     div.classList.add('message');
     div.classList.add('meta');
+
     mesajSahibi = message.username;
     //console.log("Mesajın:" + message.text);
     //console.log("ms: " + mesajSahibi);
     if (messageOwnerControl(mesajSahibi)) {
         div.classList.add('alici');
-        div.innerHTML = '<p class="meta" style="text-align:right"><i class="fas fa-eye" style="color:white"></i> ' + message.username + ' <span style="text-align:right"> ' + message.time + ' </span></p><p class="text" style="text-align:right"> ' +
-            message.text + '</p>';
+        div.innerHTML = '<p class="meta"><i class="fas fa-eye" style="color:white"></i> ' + message.username + ' <span> ' + message.time + ' </span></p><p class="text"> ' + message.text + ' </p>';
     } else {
         div.innerHTML = '<p class="meta"> ' + message.username + ' <span> ' + message.time + ' </span></p><p class="text"> ' + message.text + ' </p>';
     }
     document.querySelector('.chat-messages').appendChild(div);
+    let myData = {
+        sender: message.username,
+        zaman: message.time,
+        icerik: message.text,
+        vakit: tarih,
+        birimAdi: room
+    };
+    if (localStorage.getItem("eskiMesaj") == null) {
+        let arrayData = new Array(myData);
+        localStorage.setItem("eskiMesaj", JSON.stringify(arrayData));
+    } else {
+        let newData = JSON.parse(localStorage.getItem("eskiMesaj"));
+        newData.push(myData);
+        localStorage.setItem("eskiMesaj", JSON.stringify(newData));
+    }
     if (!focusMu() && !messageOwnerControl(message.username)) {
 
         a = true;
@@ -125,12 +142,60 @@ function outputMessage(message) {
     };
     boldMu = false;
     italikMi = false;
-    console.log("m128:"+ focusMu());
-    if(focusMu()){
+    if (focusMu()) {
         socket.emit(
-        'goz',
-        "Görüldü"
-    );
+            'goz',
+            "Görüldü"
+        );
+    }
+}
+localdenGetir();
+
+function localdenGetir() {
+    let bot = "Sinaps Ulak";
+    let eskiMesaj = localStorage.getItem("eskiMesaj");
+    eskiMesaj = JSON.parse(eskiMesaj);
+    let bugun = new Date();
+    if (eskiMesaj == null) return;
+    if (eskiMesaj.length > 0) {
+        let silinecekler = [];
+        for (var i = 0; i < eskiMesaj.length; i++) {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.classList.add('meta');
+            let eskiMesajSender = eskiMesaj[i].sender;
+            let eskiMesajZaman = eskiMesaj[i].zaman;
+            let eskiMesajIcerik = eskiMesaj[i].icerik;
+            let eskiMesajTarih = new Date(eskiMesaj[i].vakit);
+            let eskiMesajBirim = eskiMesaj[i].birimAdi;
+            if (room == eskiMesajBirim) {
+                if (bugun.getTime() <= eskiMesajTarih.getTime() + (7 * 24 * 3600 * 1000)) {
+                    if (messageOwnerControl(eskiMesaj[i].sender)) {
+                        div.classList.add('alici');
+                        div.innerHTML = '<p class="meta"> ' + eskiMesajSender + ' <span> ' + eskiMesajZaman + ' </span></p><p class="text"> ' + eskiMesajIcerik + ' </p>';
+                        document.querySelector('.chat-messages').appendChild(div);
+                    } else if (eskiMesaj[i].sender == bot) {} else {
+                        div.innerHTML = '<p class="meta"> ' + eskiMesajSender + ' <span> ' + eskiMesajZaman + ' </span></p><p class="text"> ' + eskiMesajIcerik + ' </p>';
+                        document.querySelector('.chat-messages').appendChild(div);
+                    }
+                } else if (bugun.getTime() > eskiMesajTarih.getTime() + (7 * 24 * 3600 * 1000)) {
+
+                    silinecekler.push(eskiMesaj[i]);
+
+                }
+            }
+        }
+        for (var j = silinecekler.length - 1; j >= 0; j--) {
+            //remove item selected, second parameter is the number of items to delete 
+            eskiMesaj.splice(silinecekler[j], 1);
+        }
+        // Put the object into storage
+        localStorage.setItem('eskiMesaj', JSON.stringify(eskiMesaj));
+        const hr = document.createElement('hr');
+        hr.style.height = "10px";
+        document.querySelector('.chat-messages').appendChild(hr);
+        // Scroll down
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 }
 
@@ -248,7 +313,7 @@ function showDesktopNotification(message, body, icon, sound, timeout) {
         }
     );
     instance.onclick = function() {
-        
+
     };
     instance.onerror = function() {
         // Something to do
@@ -388,10 +453,42 @@ function keySorgula(arg) {
     }
     return;
 }
+/*gecmisiGoster();
 
-/*window.addEventListener("focus", () => {
-socket.emit(
-                'goz',
-                "Görüldü"
-            );
-    });*/
+ function gecmisiGoster()
+{
+var odaAdi=roomName.innerText;
+    const tarih = new Date();
+        const ay = tarih.getMonth() + 1;
+    /*var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", "", false);
+    console.log("Oda Adı:"+room);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                
+            }
+        }
+    }
+    rawFile.send(null);
+
+
+$.ajax({
+    url: "log/log_file_"+room + "-" + tarih.getDate() + "-" + ay + "-" + tarih.getFullYear()+".txt",
+    type: 'GET'
+})
+.done(function(response) {
+    alert(response);
+})
+.fail(function() {
+    console.log("error");
+})
+.always(function() {
+    console.log("complete");
+});
+}
+*/

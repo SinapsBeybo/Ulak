@@ -14,10 +14,13 @@
         "express": "^4.17.1",
         "moment": "^2.24.0",
         "serve-favicon": "^2.5.0",
-        "socket.io": "^2.3.0"
+        "socket.io": "^2.3.0",
+        "web-push": "^3.4.4"
     },
     "devDependencies": {
         "nodemon": "^2.0.2"
     },
-    "publishConfig": { "registry": "https://npm.pkg.github.com/" }
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/"
+    }
 }
